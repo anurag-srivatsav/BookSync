@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BookShare Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    .floating-nav {
+        position: fixed;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease-in-out;
+        z-index: 1000;
+    }
+    
+    .nav-links a {
+        color: white;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+    
+    .nav-links a:hover {
+        color: #a78bfa;
+    }
+    
+    .menu-open {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    .menu-closed {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    
+    .mobile-menu {
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        z-index: 1000;
+    }
+  </style>
+</head>
+<body class="bg-purple-900 text-white min-h-screen flex flex-col items-center justify-center">
+    <!-- Floating Navbar -->
+    <!-- Floating Glassy Navbar -->
+    <nav class="floating-nav">
+        <div class="logo-container" onclick="window.location.href='index.html';">
+            <h1 class="text-xl font-semibold text-blue-200">BookSync </h1>
+        </div>
+
+        <!-- Hamburger Button -->
+        <button id="menu-btn" class="block sm:hidden focus:outline-none">
+            <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+
+        <!-- Desktop Menu -->
+        <div class="nav-links hidden sm:flex space-x-6">
+            <a href="index.html">Home</a>
+            <a href="index.html">Features</a>
+            <a href="index.html">AI picks</a>
+            <a href="index.html">Bookshelf</a>
+            <a href="index.html">contact</a>
+        </div>
+
+        <!-- Login/Signup Button -->
+        <button class="px-4 py-2 border border-gray-300 text-black bg-white rounded-full font-medium text-sm hover:bg-gray-200 transition hidden sm:block" onclick="window.location.href='loginpage.html';">
+            Login/Signup
+        </button>
+    </nav>
+
+    <!-- Mobile Menu (Hidden by default) -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 w-full h-full bg-[#1a002a] text-white flex flex-col items-center justify-center space-y-6 text-xl menu-closed sm:hidden">
+        <button id="close-menu" class="absolute top-6 right-6 text-3xl">✖</button>
+        <a href="index.html">Home</a>
+        <a href="index.html">Features</a>
+        <a href="index.html">AI picks</a>
+        <a href="index.html">Bookshelf</a>
+        <a href="index.html">contact</a>
+        <button class="px-4 py-2 border border-gray-300 text-black bg-white rounded-full font-medium text-sm hover:bg-gray-200 transition" onclick="window.location.href='loginpage.html';">
+            Login/Signup
+        </button>
+        <!-- Social Media Icons -->
+        <div class="flex space-x-4 mt-4">
+            <a href="https://www.linkedin.com/in/anuragsrivatsav/" class="text-white text-2xl"><i class="fab fa-linkedin"></i></a>
+            <a href="https://x.com/AnuragSrivatsa4" class="text-white text-2xl"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://anuragsrivatsav.netlify.app/" class="text-white text-2xl"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-white text-2xl"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
+  <div class="max-w-2xl w-full p-6 bg-purple-700 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-center text-purple-200 mb-6">What are you looking for today?</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Entertainment Option -->
+      <div 
+        id="entertainment-btn" 
+        class="p-6 bg-purple-800 rounded-lg hover:bg-purple-600 cursor-pointer transition duration-300 flex flex-col items-center"
+      >
+        <svg class="w-12 h-12 text-purple-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+        </svg>
+        <h2 class="text-xl font-semibold text-purple-200">Entertainment</h2>
+        <p class="text-purple-300 text-center mt-2">Find books for fun, fiction, and relaxation.</p>
+      </div>
+      <!-- Educational Option -->
+      <div 
+        id="educational-btn" 
+        class="p-6 bg-purple-800 rounded-lg hover:bg-purple-600 cursor-pointer transition duration-300 flex flex-col items-center"
+      >
+        <svg class="w-12 h-12 text-purple-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253"></path>
+        </svg>
+        <h2 class="text-xl font-semibold text-purple-200">Educational</h2>
+        <p class="text-purple-300 text-center mt-2">Explore books for learning and study.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Redirect to preferences based on choice
+    document.getElementById('entertainment-btn').addEventListener('click', () => {
+      window.location.href = '/preferences.html?type=entertainment';
+    });
+
+    document.getElementById('educational-btn').addEventListener('click', () => {
+      window.location.href = '/preferences.html?type=educational';
+    });
+    const menuBtn = document.getElementById("menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const closeMenu = document.getElementById("close-menu");
+    
+    menuBtn.addEventListener("click", () => {
+        mobileMenu.classList.remove("menu-closed");
+        mobileMenu.classList.add("menu-open");
+    });
+    
+    closeMenu.addEventListener("click", () => {
+        mobileMenu.classList.remove("menu-open");
+        mobileMenu.classList.add("menu-closed");
+    });
+  </script>
+</body>
+</html>

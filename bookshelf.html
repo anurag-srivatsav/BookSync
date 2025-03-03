@@ -1,0 +1,152 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookshelf - Share & Find Books</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="bg-purple-900 text-white min-h-screen flex flex-col">
+  <div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold text-center text-purple-200 mb-6">Bookshelf</h1>
+
+    <!-- Donate Section -->
+    <div class="mb-12 bg-purple-700 p-6 rounded-lg shadow-lg">
+      <h2 class="text-2xl font-semibold text-purple-200 mb-4">Donate a Book</h2>
+      <form id="donate-form" class="space-y-4">
+        <input id="book-name" type="text" placeholder="Book Name" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <input id="donor-name" type="text" placeholder="Your Name" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <input id="mobile-number" type="text" placeholder="Mobile Number" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        <textarea id="address" placeholder="Your Address" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400"></textarea>
+        <button type="submit" class="w-full p-3 bg-purple-500 hover:bg-purple-600 rounded-lg font-semibold">Donate Book</button>
+      </form>
+      <p id="donate-message" class="text-center mt-4 text-purple-200"></p>
+    </div>
+
+    <!-- Browse Section -->
+    <div class="bg-purple-700 p-6 rounded-lg shadow-lg">
+      <h2 class="text-2xl font-semibold text-purple-200 mb-4">Available Books</h2>
+      <input id="search" type="text" placeholder="Search by book name..." class="w-full p-3 mb-4 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+      <div id="bookshelf-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Books will be inserted here -->
+      </div>
+      <p id="browse-message" class="text-center mt-4 text-purple-200"></p>
+    </div>
+  </div>
+
+  <script>
+    const supabase = Supabase.createClient(
+      'https://hfwiximcfttzvqzwsatg.supabase.co', // Replace with your Supabase URL
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhmd2l4aW1jZnR0enZxendzYXRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA5MTk3NzEsImV4cCI6MjA1NjQ5NTc3MX0.GtEGe2KYbsA_sxPP8Of921SmBSEv6MQ49HB7JNafXLQ' // Replace with your Supabase Anon Key
+    );
+
+    const donateForm = document.getElementById('donate-form');
+    const bookshelfContainer = document.getElementById('bookshelf-container');
+    const donateMessage = document.getElementById('donate-message');
+    const browseMessage = document.getElementById('browse-message');
+    const searchInput = document.getElementById('search');
+
+    // Fake user ID for now
+    const fakeUserId = 1;
+
+    // Test Supabase connection
+    async function testConnection() {
+      try {
+        const { data, error } = await supabase.from('bookshelf').select('*').limit(1);
+        if (error) throw error;
+        console.log('Supabase connected! Current books:', data);
+      } catch (error) {
+        console.error('Supabase connection failed:', error.message);
+        donateMessage.textContent = 'Cannot connect to database: ' + error.message;
+      }
+    }
+    testConnection();
+
+    // Fetch and display books
+    async function loadBooks(searchTerm = '') {
+      try {
+        let query = supabase.from('bookshelf').select('*').eq('status', 'available');
+        if (searchTerm) query = query.ilike('book_name', `%${searchTerm}%`);
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        bookshelfContainer.innerHTML = '';
+        if (data.length === 0) {
+          browseMessage.textContent = searchTerm ? 'No matching books found.' : 'No books available yet.';
+          return;
+        }
+
+        browseMessage.textContent = '';
+        data.forEach(book => {
+          const card = document.createElement('div');
+          card.className = 'bg-purple-800 p-4 rounded-lg shadow-lg';
+          card.innerHTML = `
+            <h3 class="text-xl font-semibold text-purple-200">${book.book_name}</h3>
+            <p class="text-purple-300">Donor: ${book.donor_name}</p>
+            <p class="text-purple-300">Mobile: ${book.mobile_number}</p>
+            <p class="text-purple-300">Address: ${book.address}</p>
+          `;
+          bookshelfContainer.appendChild(card);
+        });
+      } catch (error) {
+        console.error('Error loading books:', error);
+        browseMessage.textContent = 'Error loading books: ' + error.message;
+      }
+    }
+
+    // Initial load
+    loadBooks();
+
+    // Donate form submission
+    donateForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const bookName = document.getElementById('book-name').value;
+      const donorName = document.getElementById('donor-name').value;
+      const mobileNumber = document.getElementById('mobile-number').value;
+      const address = document.getElementById('address').value;
+
+      if (!bookName || !donorName || !mobileNumber || !address) {
+        donateMessage.textContent = 'Please fill in all fields.';
+        return;
+      }
+
+      const bookData = {
+        user_id: fakeUserId,
+        book_name: bookName,
+        donor_name: donorName,
+        mobile_number: mobileNumber,
+        address: address
+      };
+
+      console.log('Submitting book data:', bookData);
+
+      try {
+        const { data, error } = await supabase
+          .from('bookshelf')
+          .insert([bookData]);
+
+        console.log('Insert response:', { data, error });
+
+        if (error) throw error;
+
+        donateMessage.textContent = 'Book donated successfully!';
+        donateForm.reset();
+        loadBooks(); // Refresh the list
+      } catch (error) {
+        console.error('Error donating book:', error);
+        donateMessage.textContent = 'Error donating book: ' + error.message;
+      }
+    });
+
+    // Search functionality
+    searchInput.addEventListener('input', (e) => {
+      loadBooks(e.target.value);
+    });
+  </script>
+</body>
+</html>

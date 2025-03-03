@@ -1,0 +1,112 @@
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Sharing Platform</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+</head>
+<body class="bg-purple-900 text-white min-h-screen flex items-center justify-center">
+  <div class="max-w-md w-full p-6 bg-purple-700 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-center text-purple-200 mb-6">Welcome to BookShare</h1>
+    <div id="auth-form">
+      <input id="email" type="email" placeholder="Email" class="w-full p-3 mb-4 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+      <input id="password" type="password" placeholder="Password" class="w-full p-3 mb-4 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+      <button id="login-btn" class="w-full p-3 bg-purple-500 hover:bg-purple-600 rounded-lg font-semibold">Log In</button>
+      <button id="signup-btn" class="w-full p-3 mt-2 bg-transparent border border-purple-400 hover:bg-purple-600 rounded-lg font-semibold">Sign Up</button>
+    </div>
+    <p id="auth-message" class="text-center mt-4 text-purple-200"></p>
+  </div>
+
+  <script>
+    // Initialize Supabase client
+    const supabase = Supabase.createClient(
+      '', // Replace with your Supabase URL
+      '' // Replace with your Supabase Anon Key
+    );
+
+    // Test Supabase connection on page load
+    async function testConnection() {
+      try {
+        const { data, error } = await supabase.from('users').select('*').limit(1);
+        if (error) throw error;
+        console.log('Connection successful! Existing users:', data);
+        document.getElementById('auth-message').textContent = 'Connected to Supabase!';
+      } catch (error) {
+        console.error('Connection failed:', error.message);
+        document.getElementById('auth-message').textContent = 'Connection error: ' + error.message;
+      }
+    }
+    testConnection();
+
+    // Signup Function
+    document.getElementById('signup-btn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        document.getElementById('auth-message').textContent = 'Please enter email and password.';
+        return;
+      }
+
+      console.log('Attempting signup with:', { email, password });
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .insert([{ email: email, password: password }]);
+
+        if (error) throw error;
+
+        console.log('Signup response:', data);
+        document.getElementById('auth-message').textContent = 'Signup successful! Please log in.';
+      } catch (error) {
+        console.error('Signup failed:', error);
+        document.getElementById('auth-message').textContent = 'Signup error: ' + error.message;
+      }
+    });
+
+    // Login Function
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        document.getElementById('auth-message').textContent = 'Please enter email and password.';
+        return;
+      }
+
+      console.log('Attempting login with:', { email, password });
+
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .single();
+
+        if (error) throw error;
+
+        if (data && data.password === password) {
+          console.log('Login successful:', data);
+          document.getElementById('auth-message').textContent = 'Login successful!';
+          setTimeout(() => {
+            window.location.href = '/dashboard.html';
+          }, 1000);
+        } else {
+          document.getElementById('auth-message').textContent = 'Invalid email or password.';
+        }
+      } catch (error) {
+        console.error('Login failed:', error);
+        document.getElementById('auth-message').textContent = 'Login error: ' + error.message;
+      }
+    });
+  </script>
+</body>
+</html>

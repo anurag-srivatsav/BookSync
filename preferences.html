@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Preferences</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+  <style>
+    .floating-nav {
+        position: fixed;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease-in-out;
+        z-index: 1000;
+    }
+    
+    .nav-links a {
+        color: white;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+    
+    .nav-links a:hover {
+        color: #a78bfa;
+    }
+    
+    .menu-open {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    .menu-closed {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    
+    .mobile-menu {
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        z-index: 1000;
+    }
+  </style>
+</head>
+<body class="bg-purple-900 text-white min-h-screen flex items-center justify-center">
+    <!-- Floating Navbar -->
+    <!-- Floating Glassy Navbar -->
+    <nav class="floating-nav">
+        <div class="logo-container" onclick="window.location.href='index.html';">
+            <h1 class="text-xl font-semibold text-blue-200">BookSync </h1>
+        </div>
+
+        <!-- Hamburger Button -->
+        <button id="menu-btn" class="block sm:hidden focus:outline-none">
+            <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+
+        <!-- Desktop Menu -->
+        <div class="nav-links hidden sm:flex space-x-6">
+          <a href="index.html">Home</a>
+          <a href="index.html">Features</a>
+          <a href="index.html">AI picks</a>
+          <a href="index.html">Bookshelf</a>
+          <a href="index.html">contact</a>
+        </div>
+
+        <!-- Login/Signup Button -->
+        <button class="px-4 py-2 border border-gray-300 text-black bg-white rounded-full font-medium text-sm hover:bg-gray-200 transition hidden sm:block" onclick="window.location.href='loginpage.html';">
+            Login/Signup
+        </button>
+    </nav>
+
+    <!-- Mobile Menu (Hidden by default) -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 w-full h-full bg-[#1a002a] text-white flex flex-col items-center justify-center space-y-6 text-xl menu-closed sm:hidden">
+        <button id="close-menu" class="absolute top-6 right-6 text-3xl">✖</button>
+        <a href="index.html">Home</a>
+        <a href="index.html">Features</a>
+        <a href="index.html">AI picks</a>
+        <a href="index.html">Bookshelf</a>
+        <a href="index.html">contact</a>
+        <button class="px-4 py-2 border border-gray-300 text-black bg-white rounded-full font-medium text-sm hover:bg-gray-200 transition" onclick="window.location.href='loginpage.html';">
+            Login/Signup
+        </button>
+        <!-- Social Media Icons -->
+        <div class="flex space-x-4 mt-4">
+            <a href="https://www.linkedin.com/in/anuragsrivatsav/" class="text-white text-2xl"><i class="fab fa-linkedin"></i></a>
+            <a href="https://x.com/AnuragSrivatsa4" class="text-white text-2xl"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://anuragsrivatsav.netlify.app/" class="text-white text-2xl"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-white text-2xl"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
+  <div class="max-w-lg w-full p-6 bg-purple-700 rounded-lg shadow-lg">
+    <h1 id="title" class="text-3xl font-bold text-center text-purple-200 mb-6">Tell us your preferences</h1>
+    <form id="preferences-form" class="space-y-4">
+      <div id="dynamic-fields"></div>
+      <button type="submit" class="w-full p-3 bg-purple-500 hover:bg-purple-600 rounded-lg font-semibold">Search Books</button>
+    </form>
+    <p id="message" class="text-center mt-4 text-purple-200"></p>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    const form = document.getElementById('preferences-form');
+    const dynamicFields = document.getElementById('dynamic-fields');
+
+    // Set title and fields based on type
+    if (type === 'entertainment') {
+      document.getElementById('title').textContent = 'Entertainment Preferences';
+      dynamicFields.innerHTML = `
+        <div>
+          <label class="block text-purple-200 mb-1">Language</label>
+          <input type="text" id="language" placeholder="e.g., English" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        </div>
+        <div>
+          <label class="block text-purple-200 mb-1">Genre</label>
+          <input type="text" id="genre" placeholder="e.g., Fantasy" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        </div>
+        <div>
+          <label class="block text-purple-200 mb-1">Author</label>
+          <input type="text" id="author" placeholder="e.g., J.K. Rowling" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        </div>
+      `;
+    } else if (type === 'educational') {
+      document.getElementById('title').textContent = 'Educational Preferences';
+      dynamicFields.innerHTML = `
+        <div>
+          <label class="block text-purple-200 mb-1">Course</label>
+          <input type="text" id="course" placeholder="e.g., Computer Science" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        </div>
+        <div>
+          <label class="block text-purple-200 mb-1">Subject</label>
+          <input type="text" id="subject" placeholder="e.g., Programming" class="w-full p-3 bg-purple-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+        </div>
+      `;
+    } else {
+      document.getElementById('message').textContent = 'Invalid selection. Please go back to the dashboard.';
+    }
+
+    // Handle form submission
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const preferences = {};
+
+      if (type === 'entertainment') {
+        preferences.language = document.getElementById('language').value;
+        preferences.genre = document.getElementById('genre').value;
+        preferences.author = document.getElementById('author').value;
+      } else if (type === 'educational') {
+        preferences.course = document.getElementById('course').value;
+        preferences.subject = document.getElementById('subject').value;
+      }
+
+      console.log('Preferences submitted:', preferences);
+      document.getElementById('message').textContent = 'Searching books...';
+
+      // Redirect to results page with preferences as query params
+      const query = new URLSearchParams(preferences).toString();
+      window.location.href = `/results.html?type=${type}&${query}`;
+    });
+
+    const menuBtn = document.getElementById("menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const closeMenu = document.getElementById("close-menu");
+    
+    menuBtn.addEventListener("click", () => {
+        mobileMenu.classList.remove("menu-closed");
+        mobileMenu.classList.add("menu-open");
+    });
+    
+    closeMenu.addEventListener("click", () => {
+        mobileMenu.classList.remove("menu-open");
+        mobileMenu.classList.add("menu-closed");
+    });
+  </script>
+</body>
+</html>

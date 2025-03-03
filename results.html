@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Results</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .floating-nav {
+        position: fixed;
+        top: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        max-width: 800px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 12px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease-in-out;
+        z-index: 1000;
+    }
+    
+    .nav-links a {
+        color: white;
+        font-size: 14px;
+        transition: 0.3s;
+    }
+    
+    .nav-links a:hover {
+        color: #a78bfa;
+    }
+    
+    .menu-open {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    .menu-closed {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    
+    .mobile-menu {
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        z-index: 1000;
+    }
+  </style>
+</head>
+<body class="bg-purple-900 text-white min-h-screen flex flex-col">
+    <!-- Floating Navbar -->
+    <!-- Floating Glassy Navbar -->
+    <nav class="floating-nav">
+        <div class="logo-container" onclick="window.location.href='index.html';">
+            <h1 class="text-xl font-semibold text-blue-200">BookSync </h1>
+        </div>
+
+        <!-- Hamburger Button -->
+        <button id="menu-btn" class="block sm:hidden focus:outline-none">
+            <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+        </button>
+
+        <!-- Desktop Menu -->
+        <div class="nav-links hidden sm:flex space-x-6">
+          <a href="index.html">Home</a>
+          <a href="index.html">Features</a>
+          <a href="index.html">AI picks</a>
+          <a href="index.html">Bookshelf</a>
+          <a href="index.html">contact</a>
+        </div>
+
+        <!-- Login/Signup Button -->
+        <button class="px-4 py-2 border border-gray-300 text-black bg-white rounded-full font-medium text-sm hover:bg-gray-200 transition hidden sm:block" onclick="window.location.href='loginpage.html';">
+            Login/Signup
+        </button>
+    </nav>
+
+    <!-- Mobile Menu (Hidden by default) -->
+    <div id="mobile-menu" class="mobile-menu fixed top-0 left-0 w-full h-full bg-[#1a002a] text-white flex flex-col items-center justify-center space-y-6 text-xl menu-closed sm:hidden">
+        <button id="close-menu" class="absolute top-6 right-6 text-3xl">✖</button>
+        <a href="index.html">Home</a>
+            <a href="index.html">Features</a>
+            <a href="index.html">AI picks</a>
+            <a href="index.html">Bookshelf</a>
+            <a href="index.html">contact</a>
+        <button class="px-4 py-2 border border-gray-300 text-black bg-white rounded-full font-medium text-sm hover:bg-gray-200 transition" onclick="window.location.href='loginpage.html';">
+            Login/Signup
+        </button>
+        <!-- Social Media Icons -->
+        <div class="flex space-x-4 mt-4">
+            <a href="https://www.linkedin.com/in/anuragsrivatsav/" class="text-white text-2xl"><i class="fab fa-linkedin"></i></a>
+            <a href="https://x.com/AnuragSrivatsa4" class="text-white text-2xl"><i class="fab fa-x-twitter"></i></a>
+            <a href="https://anuragsrivatsav.netlify.app/" class="text-white text-2xl"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-white text-2xl"><i class="fas fa-user"></i></a>
+        </div>
+    </div>
+  <div class="container mx-auto py-28">
+    <h1 class="text-3xl font-bold text-center text-purple-200 mb-6">Your Book Results</h1>
+    <div id="results-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Book cards will be inserted here -->
+    </div>
+    <p id="message" class="text-center mt-6 text-purple-200"></p>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    const resultsContainer = document.getElementById('results-container');
+    const message = document.getElementById('message');
+
+    // Function to fetch books from Open Library API
+    async function fetchBooks() {
+      let query = '';
+      if (type === 'entertainment') {
+        const language = urlParams.get('language') || '';
+        const genre = urlParams.get('genre') || '';
+        const author = urlParams.get('author') || '';
+
+        // Simplify query: use one field at a time for better results
+        if (author) {
+          query = author;
+        } else if (genre) {
+          query = genre;
+        } else if (language) {
+          query = `language:${language}`;
+        } else {
+          query = 'novel'; // Broader fallback than 'fiction'
+        }
+
+        console.log('Entertainment query:', query);
+      } else if (type === 'educational') {
+        const course = urlParams.get('course') || '';
+        const subject = urlParams.get('subject') || '';
+        query = `${course} ${subject}`.trim() || 'education';
+        console.log('Educational query:', query);
+      } else {
+        message.textContent = 'Invalid selection. Please go back to the dashboard.';
+        return;
+      }
+
+      message.textContent = 'Loading books...';
+
+      try {
+        const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=50`);
+        const data = await response.json();
+
+        console.log('API response:', data);
+        console.log('Number of results:', data.numFound);
+        console.log('Books found:', data.docs);
+
+        if (!data.docs || data.docs.length === 0) {
+          message.textContent = 'No books found for this search. Try broader terms like "novel" or "fantasy".';
+          return;
+        }
+
+        message.textContent = ''; // Clear loading message
+
+        // Display books
+        data.docs.forEach(book => {
+          const title = book.title || 'Unknown Title';
+          const author = book.author_name ? book.author_name.join(', ') : 'Unknown Author';
+          const coverId = book.cover_i ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg` : 'https://via.placeholder.com/150x200?text=No+Cover';
+
+          const card = document.createElement('div');
+          card.className = 'bg-purple-800 p-4 rounded-lg shadow-lg hover:bg-purple-700 transition duration-300';
+          card.innerHTML = `
+            <img src="${coverId}" alt="${title}" class="w-full h-48 object-cover rounded-t-lg">
+            <div class="p-4">
+              <h3 class="text-xl font-semibold text-purple-200">${title}</h3>
+              <p class="text-purple-300">by ${author}</p>
+              <div class="mt-2">
+                <p class="text-purple-400 text-sm"><strong>Review:</strong> "Great read! Highly recommend." (4.5/5)</p>
+              </div>
+            </div>
+          `;
+          resultsContainer.appendChild(card);
+        });
+      } catch (error) {
+        console.error('Error fetching books:', error);
+        message.textContent = 'Error loading books. Please try again.';
+      }
+    }
+
+    // Fetch books when the page loads
+    fetchBooks();
+
+    const menuBtn = document.getElementById("menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
+    const closeMenu = document.getElementById("close-menu");
+    
+    menuBtn.addEventListener("click", () => {
+        mobileMenu.classList.remove("menu-closed");
+        mobileMenu.classList.add("menu-open");
+    });
+    
+    closeMenu.addEventListener("click", () => {
+        mobileMenu.classList.remove("menu-open");
+        mobileMenu.classList.add("menu-closed");
+    });
+  </script>
+</body>
+</html>
