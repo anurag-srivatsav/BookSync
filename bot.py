@@ -2,7 +2,7 @@ import streamlit as st
 from groq import Groq
 
 # Grok setup (hardcoded key)
-GROQ_API_KEY = "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"
+GROQ_API_KEY = ""
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 # Custom CSS for purple theme
